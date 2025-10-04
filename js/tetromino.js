@@ -138,18 +138,18 @@ const drop = () => {
     currentBlock.row++;
     window.drawBoard();
     drawBlock();
+
+    if (checkGameOver(currentBlock)){
+        clearInterval(dropInterval); // main.jsに定義されているインターバルを停止する
+        alert("GAME OVER!");
+        // window.location.reload(); // OKが押されたらブラウザをリフレッシュ
+        return;
+    }
+    
     if(checkCollision()){
         stop();
         window.drawBoard();
-
         nextBlock = getRandomBlock();
-        // TODO: gameover時の最上のブロックが表示された後にalertが出たり、表示される前にalertが出たりする。
-        if (checkGameOver(nextBlock)){
-            alert("GAME OVER!");
-            clearInterval(dropInterval); // main.jsに定義されているインターバルを停止する
-            window.location.reload(); // OKが押されたらブラウザをリフレッシュ
-            return;
-        }
         currentBlock = nextBlock;
     }
 }

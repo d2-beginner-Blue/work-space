@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
 
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
+const restartButton = document.querySelector('#restart-button');
 
 // タイマー宣言
 // TODO:一時停止ボタンを押した時に、dropIntervalを止めたら、ミノの停止も止まるようにしたい。
@@ -20,9 +21,28 @@ startButton.addEventListener('click', () => {
     dropInterval = setInterval(() => {
         window.drawBoard();
         window.drop();
-    }, 500);
+    }, 50);
 
     // ボタン表示切り替え
     startButton.classList.add('d-none');
     pauseButton.classList.remove('d-none');
 })
+
+pauseButton.addEventListener('click', () => {
+   clearInterval(dropInterval);
+
+    pauseButton.classList.add('d-none');
+    restartButton.classList.remove('d-none');
+})
+
+restartButton.addEventListener('click', () => {
+    // 500msごとにブロックを落とす
+    dropInterval = setInterval(() => {
+        window.drawBoard();
+        window.drop();
+    }, 50);
+
+    restartButton.classList.add('d-none');
+    pauseButton.classList.remove('d-none'); 
+})
+
