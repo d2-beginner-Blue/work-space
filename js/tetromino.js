@@ -23,7 +23,7 @@ const COLORS = [
 const getRandomBlock = () => {
     const index = Math.floor(Math.random() * BLOCKS.length);
     return {
-        row: 0,
+        row: -1,
         col: 4,
         shape: BLOCKS[index],
         type: index
@@ -102,16 +102,78 @@ const stop = () => {
     }
 }
 
+// ゲームオーバー判定
+const checkGameOver = (newBlock) => {
+    const blockShape = newBlock.shape;
+    const blockRow = newBlock.row;
+    const blockCol = newBlock.col;
+
+    for(let r = 0; r < blockShape.length; r++){
+        for(let c = 0; c < blockShape[0].length; c++){
+            if(
+                blockShape[r][c] === 1 &&
+                window.board[blockRow + r] &&
+                window.board[blockRow + r][blockCol + c] === 1
+            ){
+                return true; // 衝突している　＝　ゲームオーバー
+            }
+        }
+    }
+
+    return false; // 衝突なし
+}
+
 const drop = () => {
     currentBlock.row++;
     window.drawBoard();
     drawBlock();
     if(checkCollision()){
         stop();
-        drawBlock();
-        currentBlock = getRandomBlock();
+        window.drawBoard();
+
+        nextBlock = getRandomBlock();
+        // TODO: gameover時の最上のブロックが表示された後にalertが出たり、表示される前にalertが出たりする。
+        if (checkGameOver(nextBlock)){
+            alert("GAME OVER!");
+            clearInterval(dropInterval); // main.jsに定義されているインターバルを停止する
+            window.location.reload(); // OKが押されたらブラウザをリフレッシュ
+            return;
+        }
+        currentBlock = nextBlock;
     }
 }
 
 // グローバル関数として公開
 window.drop = drop;
+
+const moveRight = document.querySelector('#move-right');
+const moveLeft = document.querySelector('#move-left');
+
+// 右ボタン押下時のイベント
+moveRight.addEventListener('click', () => {
+    // ■が枠外にいかないようにしないといけない
+    // つまり、右端のindexが10以上になる場合は、移動処理しない。
+    const boardWidth = currentBlock.shape[0].length;
+    let rightEdge = currentBlock.col + boardWidth;
+    if(rightEdge < 10){
+        currentBlock.col += 1;
+    }else{
+        //　右端到達し、処理なし
+    }
+
+    window.drawBoard();    
+    drawBlock();
+})
+
+// 左ボタン押下時のイベント
+moveLeft.addEventListener('click', () => {
+    // 左端のインデックスが0以下になる場合は、移動処理しない
+    let leftEdge = currentBlock.col;
+    if(leftEdge > 0){
+        currentBlock.col -= 1;
+    }else{
+        //　左端到達し、処理なし
+    }
+    window.drawBoard();
+    drawBlock();
+})
