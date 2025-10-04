@@ -97,7 +97,18 @@ const stop = () => {
     let col = currentBlock.col;
     for(let r = 0; r < currentBlock.shape.length; r++){
         for(let c = 0; c < currentBlock.shape[0].length; c++){
-            if(currentBlock.shape[r][c] == 1) window.board[row+r][col+c] = 1;
+            if(currentBlock.shape[r][c] == 1) {
+                window.board[row+r][col+c] = 1;
+
+                // ブロックを描画
+                const x = (row + r) * BLOCK_SIZE;
+                const y = (col + c) * BLOCK_SIZE
+
+                window.gameContext.fillStyle = COLORS[currentBlock.type];
+                window.gameContext.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+                window.gameContext.strokeStyle = 'black';
+                window.gameContext.strokeRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+            }
         }
     }
 }
@@ -127,18 +138,18 @@ const drop = () => {
     currentBlock.row++;
     window.drawBoard();
     drawBlock();
+
+    if (checkGameOver(currentBlock)){
+        clearInterval(dropInterval); // main.jsに定義されているインターバルを停止する
+        alert("GAME OVER!");
+        // window.location.reload(); // OKが押されたらブラウザをリフレッシュ
+        return;
+    }
+    
     if(checkCollision()){
         stop();
         window.drawBoard();
-
         nextBlock = getRandomBlock();
-        // TODO: gameover時の最上のブロックが表示された後にalertが出たり、表示される前にalertが出たりする。
-        if (checkGameOver(nextBlock)){
-            alert("GAME OVER!");
-            clearInterval(dropInterval); // main.jsに定義されているインターバルを停止する
-            window.location.reload(); // OKが押されたらブラウザをリフレッシュ
-            return;
-        }
         currentBlock = nextBlock;
     }
 }
