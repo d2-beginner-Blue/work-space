@@ -17,6 +17,9 @@ for(let r = 0; r < ROWS; r++){
     }
 }
 
+//グローバル変数として公開
+window.board = board;
+
 // canvas取得
 const canvas = document.querySelector('#main-canvas');
 const context = canvas.getContext('2d');
