@@ -92,7 +92,7 @@ const drawBlock = () => {
                     (currentBlock.row + r) * BLOCK_SIZE,
                     BLOCK_SIZE, BLOCK_SIZE
                 );
-                context.strokeStyle = 'black';
+                context.strokeStyle = '#black'; // 落下中のブロックは黒い線
                 context.strokeRect(
                     (currentBlock.col + c) * BLOCK_SIZE,
                     (currentBlock.row + r) * BLOCK_SIZE,
@@ -204,7 +204,7 @@ const rotateBlock = (shape) => {
     const rows = shape.length;
     const cols = shape[0].length;
 
-    // 開店後の新しい形状を格納する配列
+    // 回転後の新しい形状を格納する配列
     const newShape = [];
     for(let c = 0; c < cols ; c++){
         newShape[c] = new Array(rows).fill(0);
@@ -301,3 +301,4 @@ rotateButton.addEventListener('click', () => {
     window.drawBoard();
     drawBlock();
 })
+

@@ -37,16 +37,27 @@ const drawBoard = () => {
         for(let c = 0; c < COLUMNS; c++){            
             if(board[r][c] === 0){
                 context.fillStyle = 'lightgray'; // 空きマス
+                context.strokeStyle = '#e0e0e0'; // 薄いグレーの線
             }else{
                 // 1～7の値を0~6のインデックスに戻す
-                context.fillStyle = COLORS[board[r][c]-1]
+                context.fillStyle = COLORS[board[r][c]-1];
+                context.strokeStyle = '#black';
             }
-            context.strokeStyle = '#black';
             context.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
             context.strokeRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
         }
     }
 }
 
+const clearBoard = () => {
+   for(let r = 0; r < ROWS; r++){
+    board[r] = [];
+    for(let c = 0; c < COLUMNS; c++){
+        board[r][c] = 0;
+    }
+} 
+}
+
 // グローバル関数として公開
 window.drawBoard = drawBoard;
+window.clearBoard = clearBoard;
