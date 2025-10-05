@@ -248,6 +248,7 @@ const drop = () => {
             currentBlock = nextBlockSpawn;
             drawBlock();
             clearInterval(dropInterval);
+            dropInterval = null;
             alert("GAME OVER!");
             location.reload();
         }
@@ -313,3 +314,38 @@ rotateButton.addEventListener('click', () => {
     drawBlock();
 })
 
+window.addEventListener('keydown', (e) => {
+    if(!dropInterval) return;
+
+    switch(e.key) {
+        case 'ArrowLeft': // 左
+            if(!checkCollision(currentBlock, currentBlock.row, currentBlock.col - 1)){
+                currentBlock.col--;
+            }
+            break;
+        case 'ArrowRight': // 右
+            if(!checkCollision(currentBlock, currentBlock.row, currentBlock.col + 1)){
+                currentBlock.col++;
+            }
+            break;
+        case 'ArrowDown': // 下
+            drop(); // 1マス落下処理を呼ぶ
+            break;
+        case 'ArrowUp': // 上：回転
+            const newShape = rotateBlock(currentBlock.shape);
+            const tempBlock = {
+                row: currentBlock.row,
+                col: currentBlock.col,
+                shape: newShape,
+                type: currentBlock.type
+            };
+            if(!checkCollision(tempBlock, currentBlock.row, currentBlock.col)){
+                currentBlock.shape = newShape;
+            }
+            break;
+    }
+
+    window.drawBoard();
+    drawBlock();
+    drawNextBlock();
+});
