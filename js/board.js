@@ -31,15 +31,19 @@ window.gameContext = context;
 // fillRect：塗りつぶした四角形を描く
 // strokeRect:枠線だけの四角形を描く
 const drawBoard = () => {
+    const COLORS = window.COLORS;
     
     for(let r = 0; r < ROWS; r++){
         for(let c = 0; c < COLUMNS; c++){            
             if(board[r][c] === 0){
-                context.fillStyle = 'lightgray';
-                context.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                context.strokeStyle = '#black';
-                context.strokeRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                context.fillStyle = 'lightgray'; // 空きマス
+            }else{
+                // 1～7の値を0~6のインデックスに戻す
+                context.fillStyle = COLORS[board[r][c]-1]
             }
+            context.strokeStyle = '#black';
+            context.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            context.strokeRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
         }
     }
 }
