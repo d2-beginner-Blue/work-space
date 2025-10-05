@@ -31,6 +31,7 @@ startButton.addEventListener('click', () => {
 
 pauseButton.addEventListener('click', () => {
    clearInterval(dropInterval);
+   dropInterval = null;
 
     pauseButton.classList.add('d-none');
     restartButton.classList.remove('d-none');
@@ -68,7 +69,10 @@ const downButton = document.querySelector("#move-down");
 
 // 通常落下を止めて高速落下に切り替え
 downButton.addEventListener('mousedown', () => {
-    if(dropInterval) clearInterval(dropInterval);
+    if(dropInterval) {
+        clearInterval(dropInterval);
+        dropInterval = null;
+    };
 
     dropInterval = setInterval(() => {
         window.drawBoard();
@@ -78,7 +82,10 @@ downButton.addEventListener('mousedown', () => {
 
 // 指を離したら通常速度に戻す
 downButton.addEventListener('mouseup', () => {
-    if(dropInterval) clearInterval(dropInterval);
+    if(dropInterval){
+        clearInterval(dropInterval);
+        dropInterval = null;
+    };
 
     dropInterval = setInterval(() => {
         window.drawBoard();
