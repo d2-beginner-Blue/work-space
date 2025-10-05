@@ -20,10 +20,21 @@ const COLORS = [
     'orange'
 ];
 
+window.COLORS = COLORS;
+
+let score = 0;
+
+const updateScoreDisplay = () => {
+    const scoreElement = document.querySelector('#score');
+    if(scoreElement){
+        scoreElement.textContent = score;
+    }
+}
+
 const getRandomBlock = () => {
     const index = Math.floor(Math.random() * BLOCKS.length);
     return {
-        row: -1,
+        row: 0,
         col: 4,
         shape: BLOCKS[index],
         type: index
@@ -32,6 +43,43 @@ const getRandomBlock = () => {
 
 // 現在のブロックを格納
 let currentBlock = getRandomBlock();
+
+// nextブロックを格納
+let nextBlock = getRandomBlock();
+const nextCanvas = document.querySelector('#next-canvas');
+const nextContext = nextCanvas.getContext('2d');
+const NEXT_BLOCK_SIZE = 30;
+
+// nextブロックを描画する関数
+const drawNextBlock = () => {
+    // まずcanvasをクリア
+    nextContext.fillStyle = 'white';
+    nextContext.fillRect(0,0,nextCanvas.width,nextCanvas.height);
+
+    const block = nextBlock;
+    const offsetX = 1;
+    const offsetY = 1;
+
+    block.shape.forEach((row,r) => {
+        row.forEach((value,c) => {
+            if(value){
+                nextContext.fillStyle = COLORS[block.type];
+                nextContext.fillRect(
+                    (offsetX + c) * NEXT_BLOCK_SIZE,
+                    (offsetY + r) * NEXT_BLOCK_SIZE,
+                    NEXT_BLOCK_SIZE,NEXT_BLOCK_SIZE
+                );
+                nextContext.strokeStyle = 'black';
+                nextContext.strokeRect(
+                    (offsetX + c) * NEXT_BLOCK_SIZE,
+                    (offsetY + r) * NEXT_BLOCK_SIZE,
+                    NEXT_BLOCK_SIZE,NEXT_BLOCK_SIZE
+                );
+            }
+        });
+    });
+}
+
 
 const drawBlock = () => {
     const context = window.gameContext;
@@ -55,40 +103,47 @@ const drawBlock = () => {
     });
 }
 
-const checkCollision = () => {
-    let row = currentBlock.row;
-    let col = currentBlock.col;
-    let height = currentBlock.shape.length;
-    let width = currentBlock.shape[0].length;
-    let y = 0;
-    let x = 0;
+// 衝突する場合はture、しない場合はfalse
+const checkCollision = (block, targetRow, targetCol) => {
+    const blockShape = block.shape;
+    const BOARD_ROWS = window.board.length;
+    const BOARD_COLS = window.board[0].length;
 
-    // blockの底辺がboardの底辺を超える場合はture
-    if(row + height >= window.board.length) {
-        // console.log(`collision : over boards height`);
-        return true;
-    }
+    // ブロック形状内の各マスをチェック
+    for(let r = 0; r < blockShape.length; r++){
+        for(let c = 0; c < blockShape[0].length; c++){
 
-    for(let h = height; h > 0; h--){
-        for(let w = width; w > 0; w--){
-            // currentBlockのいづれかのマスが他のブロックに衝突する場合はtrue
-            if(currentBlock.shape[y][x] == 1 && window.board[row + 1][col] == 1) {
-                // console.log(`collision : collision with other blocks`);
-                // console.log(`blockPos : y = ${row}, x = ${col} ,value = ${currentBlock.shape[y][x]}`);
-                // console.log(`blockCell : y = ${x}, x = ${y} ,value = ${currentBlock.shape[y][x]}`);
-                // console.log(`boardPos : y = ${row + 1}, x = ${col} ,value = ${window.board[row + 1][col]}`);
-                return true;
+            // そのマスにブロックの構成要素が存在する場合
+            if(blockShape[r][c] === 1){
+
+                // ブロックの絶対位置
+                const boardRow = targetRow + r;
+                const boardCol = targetCol + c;
+
+                // 床との衝突チェック
+                if(boardRow >= BOARD_ROWS){
+                    return true; 
+                }
+
+                // 左右の壁との衝突チェック
+                // moveright,moveleftのチェックもここで行う
+                if(boardCol < 0 || boardCol >= BOARD_COLS){
+                    return true; 
+                }
+
+                // ボードの上端を超えていないかチェック
+                if(boardRow < 0){
+                    continue;
+                }
+
+                // 既存ブロックとの衝突チェック
+                if(window.board[boardRow][boardCol] !== 0){
+                    return true;
+                }
             }
-            col++;
-            x++;
         }
-        // 次の行へ移る際にパラメータをリセット
-        col = currentBlock.col;
-        x = 0;
-        row++;
-        y++;
     }
-    //console.log("No Collision");
+
     return false;
 }
 
@@ -98,60 +153,101 @@ const stop = () => {
     for(let r = 0; r < currentBlock.shape.length; r++){
         for(let c = 0; c < currentBlock.shape[0].length; c++){
             if(currentBlock.shape[r][c] == 1) {
-                window.board[row+r][col+c] = 1;
-
-                // ブロックを描画
-                const x = (row + r) * BLOCK_SIZE;
-                const y = (col + c) * BLOCK_SIZE
-
-                window.gameContext.fillStyle = COLORS[currentBlock.type];
-                window.gameContext.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
-                window.gameContext.strokeStyle = 'black';
-                window.gameContext.strokeRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+                window.board[row+r][col+c] = currentBlock.type + 1;
             }
         }
     }
 }
 
-// ゲームオーバー判定
-const checkGameOver = (newBlock) => {
-    const blockShape = newBlock.shape;
-    const blockRow = newBlock.row;
-    const blockCol = newBlock.col;
+// 行削除とスコア加点処理
+const clearLines = () => {
+    let lineCleared = 0;
+    const ROWS = window.board.length;
+    const COLUMNS = window.board[0].length;
 
-    for(let r = 0; r < blockShape.length; r++){
-        for(let c = 0; c < blockShape[0].length; c++){
-            if(
-                blockShape[r][c] === 1 &&
-                window.board[blockRow + r] &&
-                window.board[blockRow + r][blockCol + c] === 1
-            ){
-                return true; // 衝突している　＝　ゲームオーバー
+    // 盤面を上から下へ走査
+    for(let r = ROWS-1; r>=0; r--){
+        let isRowFull = true;
+
+        // 行が埋まっているかチェック
+        for(let c = 0; c < COLUMNS; c++){
+            if(window.board[r][c] === 0){
+                isRowFull = false;
+                break;
             }
+        }
+
+        if(isRowFull){
+            lineCleared++;
+
+            // 行を削除、上の行をシフトダウン
+            // r行目から上を1行ずつしたにコピー
+            for(let k = r; k > 0; k--){
+                window.board[k] = window.board[k-1];
+            }
+            // 最上行を新しいカラの行にする
+            window.board[0] = new Array(COLUMNS).fill(0);
+
+            // 行が削除され、上の行がシフトダウンしたため
+            // 現在の行（r）を再度チェックする必要がある
+            r++;
         }
     }
 
-    return false; // 衝突なし
+    if(lineCleared > 0){
+        score += lineCleared;
+        updateScoreDisplay();
+    }
+}
+
+const rotateBlock = (shape) => {
+    const rows = shape.length;
+    const cols = shape[0].length;
+
+    // 開店後の新しい形状を格納する配列
+    const newShape = [];
+    for(let c = 0; c < cols ; c++){
+        newShape[c] = new Array(rows).fill(0);
+    }
+
+    // 90度右回転
+    for(let r =0 ; r < rows ; r++){
+        for(let c = 0; c < cols; c++){
+            newShape[c][rows -1 - r] = shape[r][c];
+        }
+    }
+
+    return newShape;
 }
 
 const drop = () => {
-    currentBlock.row++;
+    // 次の行で衝突するかをチェック
+    // 衝突する場合、ブロックを固定し、新しいブロックを生成
+    if(checkCollision(currentBlock,currentBlock.row+1,currentBlock.col)){
+        stop();
+
+        clearLines();
+
+        // 新しいブロックをnextBlockから取得
+        let nextBlockSpawn = nextBlock; //nextブロックをスポーン予定のブロックとして一時保存
+        nextBlock = getRandomBlock();
+
+        // ゲームオーバー判定
+        if(checkCollision(nextBlockSpawn,nextBlockSpawn.row,nextBlockSpawn.col)){
+            currentBlock = nextBlockSpawn;
+            drawBlock();
+            clearInterval(dropInterval);
+            alert("GAME OVER!");
+            return;
+        }
+        currentBlock = nextBlockSpawn;
+    }else{ // 衝突しない場合、一マス下へ移動
+        currentBlock.row++;
+    }
+
     window.drawBoard();
     drawBlock();
-
-    if (checkGameOver(currentBlock)){
-        clearInterval(dropInterval); // main.jsに定義されているインターバルを停止する
-        alert("GAME OVER!");
-        // window.location.reload(); // OKが押されたらブラウザをリフレッシュ
-        return;
-    }
-    
-    if(checkCollision()){
-        stop();
-        window.drawBoard();
-        nextBlock = getRandomBlock();
-        currentBlock = nextBlock;
-    }
+    drawNextBlock();
 }
 
 // グローバル関数として公開
@@ -162,14 +258,10 @@ const moveLeft = document.querySelector('#move-left');
 
 // 右ボタン押下時のイベント
 moveRight.addEventListener('click', () => {
-    // ■が枠外にいかないようにしないといけない
-    // つまり、右端のindexが10以上になる場合は、移動処理しない。
-    const boardWidth = currentBlock.shape[0].length;
-    let rightEdge = currentBlock.col + boardWidth;
-    if(rightEdge < 10){
-        currentBlock.col += 1;
-    }else{
-        //　右端到達し、処理なし
+    // 右端との衝突チェック
+    const nextCol = currentBlock.col + 1;
+    if(!checkCollision(currentBlock,currentBlock.row,nextCol)){
+        currentBlock.col = nextCol; // 衝突しない場合は移動
     }
 
     window.drawBoard();    
@@ -178,13 +270,34 @@ moveRight.addEventListener('click', () => {
 
 // 左ボタン押下時のイベント
 moveLeft.addEventListener('click', () => {
-    // 左端のインデックスが0以下になる場合は、移動処理しない
-    let leftEdge = currentBlock.col;
-    if(leftEdge > 0){
-        currentBlock.col -= 1;
-    }else{
-        //　左端到達し、処理なし
+    // 左端との衝突チェック
+    const nextCol = currentBlock.col -1;
+    if(!checkCollision(currentBlock,currentBlock.row,nextCol)){
+        currentBlock.col = nextCol;
     }
+
+    window.drawBoard();
+    drawBlock();
+})
+
+// 回転ボタン押下のイベント
+const rotateButton = document.querySelector('#rotate');
+
+rotateButton.addEventListener('click', () => {
+    // 回転後の形状を取得
+    const newShape = rotateBlock(currentBlock.shape);
+
+    // 一時的に回転後のオブジェクトに置き換え、衝突チェックを行う。
+    const tempBlock = {
+        row: currentBlock.row,
+        col: currentBlock.col,
+        shape: newShape,
+        type: currentBlock.type, 
+    };
+    if(!checkCollision(tempBlock,currentBlock.row,currentBlock.col)){
+        currentBlock.shape = newShape; // 衝突がなければ置き換え
+    }
+
     window.drawBoard();
     drawBlock();
 })

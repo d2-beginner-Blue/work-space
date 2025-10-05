@@ -3,6 +3,7 @@
 // ページ読み込み時に初期画面を描画
 window.addEventListener('load', () => {
     window.drawBoard();
+    window.drawNextBoard();
 });
 
 const startButton = document.querySelector("#start-button");
@@ -21,7 +22,7 @@ startButton.addEventListener('click', () => {
     dropInterval = setInterval(() => {
         window.drawBoard();
         window.drop();
-    }, 50);
+    }, 300);
 
     // ボタン表示切り替え
     startButton.classList.add('d-none');
@@ -40,7 +41,7 @@ restartButton.addEventListener('click', () => {
     dropInterval = setInterval(() => {
         window.drawBoard();
         window.drop();
-    }, 50);
+    }, 300);
 
     restartButton.classList.add('d-none');
     pauseButton.classList.remove('d-none'); 
