@@ -9,6 +9,7 @@ window.addEventListener('load', () => {
 const startButton = document.querySelector("#start-button");
 const pauseButton = document.querySelector("#pause-button");
 const restartButton = document.querySelector('#restart-button');
+const resetButton = document.querySelector('#reset-button');
 
 // タイマー宣言
 // TODO:一時停止ボタンを押した時に、dropIntervalを止めたら、ミノの停止も止まるようにしたい。
@@ -18,7 +19,7 @@ startButton.addEventListener('click', () => {
     // 既にタイマーが動いていたら一旦クリア
     if(dropInterval) clearInterval(dropInterval);
 
-    // 500msごとにブロックを落とす
+    // 300msごとにブロックを落とす
     dropInterval = setInterval(() => {
         window.drawBoard();
         window.drop();
@@ -34,6 +35,7 @@ pauseButton.addEventListener('click', () => {
 
     pauseButton.classList.add('d-none');
     restartButton.classList.remove('d-none');
+    resetButton.classList.remove('d-none');
 })
 
 restartButton.addEventListener('click', () => {
@@ -44,6 +46,17 @@ restartButton.addEventListener('click', () => {
     }, 300);
 
     restartButton.classList.add('d-none');
+    resetButton.classList.add('d-none');
     pauseButton.classList.remove('d-none'); 
 })
 
+resetButton.addEventListener('click', () => {
+    window.clerBoard();
+    window.drawBoard();
+
+    currentBlock = getRandomBlock();
+
+    score = 0;
+
+    document.querySelector('#score').textContent = score;
+})

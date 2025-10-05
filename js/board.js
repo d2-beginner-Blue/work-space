@@ -48,5 +48,16 @@ const drawBoard = () => {
     }
 }
 
+const clerBoard = () => {
+   for(let r = 0; r < ROWS; r++){
+    board[r] = [];
+    for(let c = 0; c < COLUMNS; c++){
+        board[r][c] = 0;
+    }
+} 
+}
+
 // グローバル関数として公開
 window.drawBoard = drawBoard;
+
+window.clerBoard = clerBoard;
