@@ -92,7 +92,7 @@ const drawBlock = () => {
                     (currentBlock.row + r) * BLOCK_SIZE,
                     BLOCK_SIZE, BLOCK_SIZE
                 );
-                context.strokeStyle = 'black';
+                context.strokeStyle = '#black'; // 落下中のブロックは黒い線
                 context.strokeRect(
                     (currentBlock.col + c) * BLOCK_SIZE,
                     (currentBlock.row + r) * BLOCK_SIZE,

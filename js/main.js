@@ -50,7 +50,7 @@ restartButton.addEventListener('click', () => {
 })
 
 resetButton.addEventListener('click', () => {
-    window.clerBoard();
+    window.clearBoard();
     window.drawBoard();
 
     currentBlock = getRandomBlock();
