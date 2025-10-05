@@ -3,7 +3,6 @@
 // ページ読み込み時に初期画面を描画
 window.addEventListener('load', () => {
     window.drawBoard();
-    window.drawNextBoard();
 });
 
 const startButton = document.querySelector("#start-button");
@@ -39,11 +38,11 @@ pauseButton.addEventListener('click', () => {
 })
 
 restartButton.addEventListener('click', () => {
-    // 500msごとにブロックを落とす
+    // 400msごとにブロックを落とす
     dropInterval = setInterval(() => {
         window.drawBoard();
         window.drop();
-    }, 300);
+    }, 400);
 
     restartButton.classList.add('d-none');
     resetButton.classList.add('d-none');
@@ -59,4 +58,26 @@ resetButton.addEventListener('click', () => {
     score = 0;
 
     document.querySelector('#score').textContent = score;
+})
+
+const downButton = document.querySelector("#move-down");
+
+// 通常落下を止めて高速落下に切り替え
+downButton.addEventListener('mousedown', () => {
+    if(dropInterval) clearInterval(dropInterval);
+
+    dropInterval = setInterval(() => {
+        window.drawBoard();
+        window.drop();
+    }, 50);
+});
+
+// 指を離したら通常速度に戻す
+downButton.addEventListener('mouseup', () => {
+    if(dropInterval) clearInterval(dropInterval);
+
+    dropInterval = setInterval(() => {
+        window.drawBoard();
+        window.drop();
+    }, 400);
 })
