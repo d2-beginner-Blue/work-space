@@ -249,7 +249,7 @@ const drop = () => {
             drawBlock();
             clearInterval(dropInterval);
             alert("GAME OVER!");
-            return;
+            location.reload();
         }
         currentBlock = nextBlockSpawn;
     }else{ // 衝突しない場合、一マス下へ移動
