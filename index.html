@@ -42,11 +42,19 @@
             </div>
         </section>
 
-            <!-- NEXTエリア -->
-            <div class="d-flex flex-column justify-content-center">
-                <canvas id="next-canvas" width="180" height="120" class="border">
-                </canvas>
-            </div>
+    <!-- NEXTエリア -->
+    <div class="d-flex flex-column align-items-start gap-3 mt-4" style="width: 300px;">
+        <canvas id="next-canvas" width="180" height="120" class="border mb-3"></canvas>
+        <section class="controls text-center w-100">
+            <h2 class="h4 ">操作方法</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">← 左矢印キー：ミノを左に移動</li>
+                <li class="list-group-item">→ 右矢印キー：ミノを右に移動</li>
+                <li class="list-group-item">↓ 下矢印キー：ミノを1マス下に落下</li>
+                <li class="list-group-item">↑ 上矢印キー：ミノを90度回転</li>
+            </ul>
+        </section>
+    </div>
     </main>
     <script src="js/board.js" defer></script>
     <script src="js/tetromino.js" defer></script>
