@@ -58,6 +58,10 @@ resetButton.addEventListener('click', () => {
     score = 0;
 
     document.querySelector('#score').textContent = score;
+
+    restartButton.classList.add('d-none');
+    resetButton.classList.add('d-none');
+    startButton.classList.remove('d-none');
 })
 
 const downButton = document.querySelector("#move-down");

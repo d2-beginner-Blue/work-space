@@ -33,9 +33,15 @@ const updateScoreDisplay = () => {
 
 const getRandomBlock = () => {
     const index = Math.floor(Math.random() * BLOCKS.length);
+    
+    let col = 4;
+    if (index === 0) {
+        col = 1;
+    }
+    
     return {
         row: 0,
-        col: 4,
+        col: col,
         shape: BLOCKS[index],
         type: index
     };
@@ -57,7 +63,12 @@ const drawNextBlock = () => {
     nextContext.fillRect(0,0,nextCanvas.width,nextCanvas.height);
 
     const block = nextBlock;
-    const offsetX = 1;
+
+    const blockWidth = block.shape[0].length;
+    
+    const offsetX = (6 - blockWidth) / 2;
+    
+    // ブロック表示位置を1マス上げる
     const offsetY = 1;
 
     block.shape.forEach((row,r) => {
@@ -69,7 +80,7 @@ const drawNextBlock = () => {
                     (offsetY + r) * NEXT_BLOCK_SIZE,
                     NEXT_BLOCK_SIZE,NEXT_BLOCK_SIZE
                 );
-                nextContext.strokeStyle = 'black';
+                nextContext.strokeStyle = 'white';
                 nextContext.strokeRect(
                     (offsetX + c) * NEXT_BLOCK_SIZE,
                     (offsetY + r) * NEXT_BLOCK_SIZE,
@@ -238,7 +249,7 @@ const drop = () => {
             drawBlock();
             clearInterval(dropInterval);
             alert("GAME OVER!");
-            return;
+            location.reload();
         }
         currentBlock = nextBlockSpawn;
     }else{ // 衝突しない場合、一マス下へ移動
